@@ -1,6 +1,7 @@
 import React from 'react';
 import { Select, Table, Input, Button, Row, Col, Layout } from 'antd';
 import { fetchBanks } from '../actions/api'
+import _ from 'lodash'
 const Option = Select.Option;
 const Search = Input.Search;
 const { Content } = Layout;
@@ -8,6 +9,7 @@ const { Content } = Layout;
 class BankFinder extends React.Component {
   constructor(props) {
     super(props);
+    // Initial state
     this.state = {
       defaultCity: 'bangalore',
       banks: [],
@@ -16,6 +18,7 @@ class BankFinder extends React.Component {
     };
   }
 
+  // List of cities
   CITIES = [{
     key: 'bangalore',
     name: 'Bangalore'
@@ -33,6 +36,7 @@ class BankFinder extends React.Component {
     name: 'Surat'
   }]
 
+  // Column definitions for antd table
   BANK_COLUMS = [{
     title: 'Bank ID',
     dataIndex: 'bank_id',
@@ -69,44 +73,56 @@ class BankFinder extends React.Component {
 
   componentDidMount = () => {
     const { defaultCity } = this.state
+    // Fetch the list of banks for default city
     this.fetchBanks(defaultCity)
   }
 
+  // Fetch the list of banks for the selected city
   handleChange = value => {
     this.fetchBanks(value);
   }
 
+  // Fetch the list of banks via API
   fetchBanks = (value) => {
     let bankRequest = fetchBanks(value);
+    // Resolve promise returned by fetchBanks
     bankRequest.then(response => {
       this.setState({
         banks: response.data
       })
-      console.log(this.state)
     })
   }
 
+  // Show the list of banks according to the word typed in search area
   searchRecord = (value) => {
     let { banks } = this.state;
+    let filterValue = _.toLower(value);
+    console.log(filterValue)
+    // Filter the list of banks according to the word typed in in search area
     let filteredBanks = banks.filter(e => {
       return (
-        e.address.indexOf(value) > -1 ||
-        e.city.indexOf(value) > -1 ||
-        e.district.indexOf(value) > -1 ||
-        e.state.indexOf(value) > -1 ||
-        e.branch.indexOf(value) > -1 ||
-        e.ifsc.indexOf(value) > -1 ||
-        e.bank_name.indexOf(value) > -1 ||
-        e.bank_id === value
+        _.toLower(e.address).indexOf(filterValue) > -1 ||
+        _.toLower(e.city).indexOf(filterValue) > -1 ||
+        _.toLower(e.district).indexOf(filterValue) > -1 ||
+        _.toLower(e.state).indexOf(filterValue) > -1 ||
+        _.toLower(e.branch).indexOf(filterValue) > -1 ||
+        _.toLower(e.bank_name).indexOf(filterValue) > -1 ||
+
+        // No partial match for IFSC & bank id
+        _.toLower(e.ifsc) === filterValue ||
+        _.toString(e.bank_id) === filterValue
       )
     })
 
+    console.log(filteredBanks)
+    // Updates the value of filteredBanks
     this.setState({
       filteredBanks: filteredBanks,
       filterApplied: true
     })
   }
 
+  // Clear the list of banks which is shown after the search(keyword)
   clearSearch = () => {
     this.searchedText.value = '';
     this.setState({
