@@ -133,14 +133,14 @@ class BankFinder extends React.Component {
             </Col>
             <Col span={12}>
               <Search
-                placeholder="input search text"
+                placeholder="input search text. Press Enter to apply filter"
                 onSearch={this.searchRecord}
                 style={{ width: 500 }}
                 ref={ref => this.searchedText = ref}
               />
             </Col>
             <Col>
-            <Button onClick={this.clearSearch}>Clear Search</Button>
+            <Button type="primary" onClick={this.clearSearch}>Clear Search</Button>
             </Col>
           </Row>
           <br></br>
