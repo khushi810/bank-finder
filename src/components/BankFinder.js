@@ -5,7 +5,7 @@ const Option = Select.Option;
 const Search = Input.Search;
 const { Content } = Layout;
 
-class Form extends React.Component {
+class BankFinder extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -153,4 +153,4 @@ class Form extends React.Component {
   }
 }
 
-export default Form;
+export default BankFinder;
