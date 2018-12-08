@@ -1,13 +1,19 @@
 import React from 'react';
-import { Select, Table, Input } from 'antd';
+import { Select, Table, Input, Button, Row, Col, Layout } from 'antd';
 import { fetchBanks } from '../actions/api'
 const Option = Select.Option;
 const Search = Input.Search;
+const { Content } = Layout;
 
 class Form extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      defaultCity: 'bangalore',
+      banks: [],
+      filterApplied: false,
+      filteredBanks: [],
+    };
   }
 
   CITIES = [{
@@ -61,6 +67,11 @@ class Form extends React.Component {
     key: 'address'
   }]
 
+  componentDidMount = () => {
+    const { defaultCity } = this.state
+    this.fetchBanks(defaultCity)
+  }
+
   handleChange = value => {
     this.fetchBanks(value);
   }
@@ -91,25 +102,52 @@ class Form extends React.Component {
     })
 
     this.setState({
-      banks: filteredBanks
+      filteredBanks: filteredBanks,
+      filterApplied: true
+    })
+  }
+
+  clearSearch = () => {
+    this.searchedText.value = '';
+    this.setState({
+      filterApplied: false,
+      filteredBanks: []
     })
   }
 
   render() {
+    const { 
+      filterApplied, filteredBanks, banks, defaultCity
+    } = this.state;
     return (
       <div>
-        <Select style={{ width: 120 }} onChange={this.handleChange}>
-          {
-            this.CITIES.map((city) => {
-              return (<Option key={city.key} value={city.key}>{city.name}</Option>)
-            })}
-        </Select>
-        <Search
-          placeholder="input search text"
-          onSearch={this.searchRecord}
-          style={{ width: 200 }}
-        />
-        <Table rowKey={record => record.ifsc} dataSource={this.state.banks} columns={this.BANK_COLUMS}/>
+        <Content style={{ padding: '0 50px' }}>
+          <Row>
+            <Col span={6}>
+              <Select defaultValue={defaultCity} style={{ width: 120 }} onChange={this.handleChange}>
+                {
+                  this.CITIES.map((city) => {
+                    return (<Option key={city.key} value={city.key}>{city.name}</Option>)
+                  })}
+              </Select>
+            </Col>
+            <Col span={12}>
+              <Search
+                placeholder="input search text"
+                onSearch={this.searchRecord}
+                style={{ width: 500 }}
+                ref={ref => this.searchedText = ref}
+              />
+            </Col>
+            <Col>
+            <Button onClick={this.clearSearch}>Clear Search</Button>
+            </Col>
+          </Row>
+          <br></br>
+          <Row>
+            <Table rowKey={record => record.ifsc} dataSource={filterApplied ? filteredBanks : banks} columns={this.BANK_COLUMS}/>
+          </Row>
+        </Content>
       </div>
     ) 
   }
